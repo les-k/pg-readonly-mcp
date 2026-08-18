@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pg-readonly-mcp"
+version = "0.1.0"
+description = "A read-only Postgres MCP server that parses SQL rather than pattern-matching it"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+authors = [{ name = "Leslie Kadenge" }]
+keywords = ["mcp", "postgres", "sql", "security", "read-only"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Database",
+    "Topic :: Security",
+]
+dependencies = [
+    "mcp>=2.0",
+    "sqlglot>=27.0",
+    "psycopg[binary]>=3.2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4", "pytest-cov>=4.1", "ruff>=0.6"]
+
+[project.scripts]
+pg-readonly-mcp = "pg_readonly_mcp.server:main"
+
+[project.urls]
+Homepage = "https://github.com/les-k/pg-readonly-mcp"
+Issues = "https://github.com/les-k/pg-readonly-mcp/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# No JavaScript ships here, so there are no source maps to leak. Declared
+# anyway: it costs nothing, and it keeps a supply-chain scanner's checklist
+# honest rather than arguing with it.
+[tool.setuptools.exclude-package-data]
+"*" = ["*.map", "*.pyc", "*.pyo"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.coverage.run]
+source = ["pg_readonly_mcp"]
+branch = true

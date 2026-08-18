@@ -1,0 +1,63 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    # No Windows leg: GitHub Actions service containers are Linux-only, and
+    # every test that matters here needs a real Postgres, not a mocked one --
+    # a mocked connection would return whatever it was told to and prove
+    # nothing about what check_connection_is_readonly actually does against
+    # real role attributes and real grants.
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      PG_READONLY_MCP_TEST_ADMIN_DSN: postgresql://postgres:postgres@localhost:5432/postgres
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Lint
+        run: ruff check src tests
+
+      - name: Test
+        run: pytest -q --cov=pg_readonly_mcp --cov-report=term-missing
+
+      - name: Fail if the live-database tests were skipped
+        run: |
+          pytest -q -rs 2>&1 | tee out.txt
+          if grep -q "no Postgres reachable" out.txt; then
+            echo "Database tests skipped here - a real Postgres service container is configured and must be reachable."
+            exit 1
+          fi

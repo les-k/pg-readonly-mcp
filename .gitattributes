@@ -1,0 +1,5 @@
+# Keep line endings consistent across Windows, Linux, and macOS checkouts
+# so CI sees the same bytes the author committed.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
