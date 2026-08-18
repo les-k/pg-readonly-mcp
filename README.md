@@ -191,6 +191,25 @@ cancelled query leaves the connection usable for the next one, and that a
 role with `CREATEDB` and zero table grants is refused on the role attribute
 alone.
 
+Coverage on CI, against a real Postgres: **78%, `guard.py` at 100%.** The gap
+in `server.py` is the generic `psycopg.Error` catch-all — nothing in the
+suite deliberately provokes a database error that isn't a cancellation — and
+`main()`'s argparse and transport wiring, which the suite exercises through
+`build_server` directly instead; the transport is the part least worth
+mocking and least likely to be where a real mistake hides.
+
+**The first version of this pushed did not pass.** Two bugs surfaced only
+once a real Postgres service container ran the suite for the first time,
+and neither was visible from the code alone: `SET statement_timeout = %s`
+reached Postgres as `SET statement_timeout = $1` and failed to parse, because
+`SET` is a utility statement and does not accept a bind parameter the way a
+`SELECT` does — every real call to the tool would have failed identically.
+Separately, the test fixtures tried to `DROP ROLE` a role that still held
+live grants, which Postgres refuses; `DROP OWNED BY` has to run first. Both
+are fixed, and the run since is the one these numbers describe. Left in
+because a suite that only ever reports success is a suite nobody has watched
+fail.
+
 ## Layout
 
 ```
