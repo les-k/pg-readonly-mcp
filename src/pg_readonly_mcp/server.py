@@ -149,9 +149,16 @@ def build_server(
             raise Denied(f"refused: {exc}") from exc
 
         # The integer here is server-controlled, never the agent's SQL text --
-        # this SET is not something the guard needs to see.
+        # this SET is not something the guard needs to see. It is also not
+        # something psycopg can parameterize: SET is a utility statement, not
+        # DML, and Postgres's grammar for it does not accept a bind parameter
+        # in the value position -- `SET statement_timeout = %s` reaches the
+        # server as `SET statement_timeout = $1` and fails to parse. The int()
+        # cast is what keeps direct interpolation safe here: state.timeout_ms
+        # is a plain int from the constructor, never a string built from
+        # anything the caller sent.
         with state.conn.cursor() as cur:
-            cur.execute("SET statement_timeout = %s", (state.timeout_ms,))
+            cur.execute(f"SET statement_timeout = {int(state.timeout_ms)}")
             try:
                 cur.execute(sql)
             except psycopg.errors.QueryCanceled as exc:

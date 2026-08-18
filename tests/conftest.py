@@ -88,7 +88,16 @@ def _new_role(admin_conn: psycopg.Connection, *, extra_attrs: str = "") -> str:
 
 
 def _drop_role(admin_conn: psycopg.Connection, role: str) -> None:
+    """Drop a role created by these fixtures.
+
+    A role that was ever GRANTed anything cannot be dropped directly --
+    Postgres refuses with "cannot be dropped because some objects depend on
+    it", because the role's own privileges count as dependent objects.
+    ``DROP OWNED BY`` revokes every grant made *to* the role and drops
+    anything it owns, and has to run first.
+    """
     with admin_conn.cursor() as cur:
+        cur.execute(f"DROP OWNED BY {role}")
         cur.execute(f"DROP ROLE {role}")
 
 
