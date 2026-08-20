@@ -1,5 +1,11 @@
 # pg-readonly-mcp
 
+> **In plain terms:** this lets an AI look at your database and do nothing else.
+> Not because it was told not to write — the database login it uses is physically
+> incapable of writing. The official version of this tool had a published flaw
+> that let a "delete everything" command slip past its safety check; this one is
+> tested against that exact attack.
+
 A read-only Postgres MCP server that parses SQL rather than pattern-matching
 it — because the alternative has already failed in public, once, in a way
 that is worth being specific about.
