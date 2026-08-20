@@ -1,5 +1,9 @@
 # pg-readonly-mcp
 
+[![CI](https://github.com/les-k/pg-readonly-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/les-k/pg-readonly-mcp/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/python-3.11%20%E2%80%93%203.13-blue)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 > **In plain terms:** this lets an AI look at your database and do nothing else.
 > Not because it was told not to write — the database login it uses is physically
 > incapable of writing. The official version of this tool had a published flaw
