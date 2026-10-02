@@ -1,3 +1,4 @@
+<!-- mcp-name: io.github.les-k/pg-readonly-mcp -->
 # pg-readonly-mcp
 
 [![CI](https://github.com/les-k/pg-readonly-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/les-k/pg-readonly-mcp/actions/workflows/ci.yml)
@@ -139,8 +140,10 @@ and why is worth more than a clean number would be on its own.
 ## Install
 
 ```bash
-pip install -e .
+pip install pg-readonly-mcp
 ```
+
+From a source checkout: `pip install -e .`
 
 ## Configure
 
@@ -239,3 +242,7 @@ else.
 ## Licence
 
 MIT.
+
+## Author
+
+Built by [Leslie Kadenge](https://les-k.github.io). I do independent security reviews of MCP servers; my public survey of thirteen production servers is at [les-k.github.io/field-notes.html](https://les-k.github.io/field-notes.html).

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.les-k/pg-readonly-mcp",
+  "description": "A read-only Postgres MCP server that parses SQL rather than pattern-matching it.",
+  "repository": {
+    "url": "https://github.com/les-k/pg-readonly-mcp",
+    "source": "github"
+  },
+  "websiteUrl": "https://les-k.github.io/field-notes.html",
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "pg-readonly-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "description": "Postgres connection string for a role that holds only SELECT. The server refuses to start otherwise.",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": true,
+          "name": "PG_READONLY_MCP_DSN"
+        }
+      ]
+    }
+  ]
+}
