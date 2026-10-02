@@ -32,6 +32,7 @@ from typing import Any
 
 import psycopg
 from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import ToolAnnotations
 
 from .guard import Denied, validate_readonly
@@ -102,7 +103,7 @@ def build_server(
     *,
     max_rows: int = DEFAULT_MAX_ROWS,
     timeout_ms: int = DEFAULT_TIMEOUT_MS,
-    version: str = "0.1.0",
+    version: str = "0.1.1",
 ) -> MCPServer:
     """Wire the query tool onto an already-open, already-checked connection.
 
@@ -146,7 +147,7 @@ def build_server(
         try:
             validate_readonly(sql)
         except Denied as exc:
-            raise Denied(f"refused: {exc}") from exc
+            raise ToolError(f"refused: {exc}") from exc
 
         # The integer here is server-controlled, never the agent's SQL text --
         # this SET is not something the guard needs to see. It is also not
@@ -163,10 +164,10 @@ def build_server(
                 cur.execute(sql)
             except psycopg.errors.QueryCanceled as exc:
                 state.conn.rollback()
-                raise Denied(f"query exceeded {state.timeout_ms}ms and was cancelled") from exc
+                raise ToolError(f"query exceeded {state.timeout_ms}ms and was cancelled") from exc
             except psycopg.Error as exc:
                 state.conn.rollback()
-                raise Denied(f"database refused the query: {exc}") from exc
+                raise ToolError(f"database refused the query: {exc}") from exc
 
             columns = [desc.name for desc in cur.description] if cur.description else []
             rows = cur.fetchmany(state.max_rows + 1)
